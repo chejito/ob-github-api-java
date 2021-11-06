@@ -1,6 +1,6 @@
 ## GITHUB-API-JAVA
 
-###Cliente escrito en Java para acceso a la API de GitHub desde Interfaz de Línea de Comandos (CLI)
+###Cliente para acceso a la API de GitHub desde Interfaz de Línea de Comandos (CLI)
 
 * Desarrollado en Java 17.
 * Librería: Jackson versión 2.13.0.
