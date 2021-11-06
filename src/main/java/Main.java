@@ -35,12 +35,14 @@ public class Main {
 
         } while (!Objects.equals(authType.toLowerCase(), "s") && !Objects.equals(authType.toLowerCase(), "n"));
 
-        token = MY_PAT;
-
         if (Objects.equals(authType.toLowerCase(), "n")) {
 
             token = getToken(scanner, "Introduce tu token: ");
             System.out.println(("Tu token es: " + token));
+
+        } else {
+
+            token = MY_PAT;
 
         }
 
@@ -48,34 +50,54 @@ public class Main {
 
         System.out.println();
 
-        ArrayList<Map> repos = ApiCall.getRepos(githubUser + "/repos", authorization);
+        try {
 
-        System.out.println("Usuario: " + githubUser + " - Número de repositorios: " + repos.size());
+            ArrayList<Map> repos = ApiCall.getRepos(githubUser + "/repos", authorization);
 
-        for (Map repo : repos) {
-
-            String repoName = repo.get("name").toString();
-
-            ArrayList<Map> commits = ApiCall.getCommits(githubUser + "/" + repoName + "/commits", authorization);
-
-            System.out.println("-> Repositorio: " + repoName + " - Número de commits: " + commits.size());
-
-            for (Map commit : commits) {
-
-                String commitSha = commit.get("sha").toString();
-                System.out.println("---> Sha:" + commitSha);
-
-                scanner.close();
-            }
-
+            System.out.println("Usuario: " + githubUser + " - Número de repositorios: " + repos.size());
             System.out.println();
 
+            for (Map repo : repos) {
+
+                String repoName = repo.get("name").toString();
+
+                try {
+
+                    ArrayList<Map> commits = ApiCall.getCommits(githubUser + "/" + repoName + "/commits", authorization);
+
+                    System.out.println("-> Repositorio: " + repoName + "\n-> Número de commits: " + commits.size());
+
+                    for (Map commit : commits) {
+
+                        String commitSha = commit.get("sha").toString();
+                        System.out.println("---> Sha: " + commitSha);
+
+                    }
+
+                    System.out.println();
+
+                } catch (Exception e) {
+
+                    System.out.println("-> Repositorio: " + repoName + "\n-> No se han podido encontrar commits");
+
+                }
+
+            }
+
+        } catch (Exception e) {
+
+            System.out.println("No se ha podido encontrar el repositorio");
+
         }
+
+        scanner.close();
+
     }
 
     private static String getToken(Scanner scanner, String message) {
 
         String userToken;
+
         do {
 
             System.out.println(message);

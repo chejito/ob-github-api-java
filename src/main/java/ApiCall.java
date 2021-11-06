@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public class ApiCall {
 
-    static ArrayList getRepos(String path, String authorization) {
+    static ArrayList getRepos(String path, String authorization) throws IOException, InterruptedException {
 
         final String BASE_URL = "https://api.github.com/users/";
         ObjectMapper mapper = new ObjectMapper();
@@ -20,32 +21,22 @@ public class ApiCall {
                 .GET()
                 .build();
 
-        try {
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        ArrayList jsonList = mapper.readValue(response.body(), ArrayList.class);
+        ArrayList<Map> jsonListOfMaps = new ArrayList<Map>();
 
-            ArrayList jsonList = mapper.readValue(response.body(), ArrayList.class);
-            ArrayList<Map> jsonListOfMaps = new ArrayList<Map>();
+        for (var json : jsonList) {
 
-            for (var json : jsonList) {
-
-                Map jsonMap = mapper.convertValue(json, Map.class);
-                jsonListOfMaps.add(jsonMap);
-
-            }
-
-            return jsonListOfMaps;
-
-        } catch (Exception e) {
-
-            System.out.println("No se han podido encontrar repositorios");
-            //e.printStackTrace();
-            return new ArrayList();
+            Map jsonMap = mapper.convertValue(json, Map.class);
+            jsonListOfMaps.add(jsonMap);
 
         }
+
+        return jsonListOfMaps;
     }
 
-    static ArrayList getCommits(String path, String authorization) {
+    static ArrayList getCommits(String path, String authorization) throws IOException, InterruptedException {
 
         final String BASE_URL = "https://api.github.com/repos/";
         ObjectMapper mapper = new ObjectMapper();
@@ -54,8 +45,6 @@ public class ApiCall {
                 .setHeader("Authorization", authorization)
                 .GET()
                 .build();
-
-        try {
 
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -72,12 +61,7 @@ public class ApiCall {
 
             return jsonList;
 
-        } catch (Exception e) {
-
-            System.out.println("No se han podido encontrar commits");
-            //e.printStackTrace();
-            return new ArrayList();
-
-        }
     }
+
+
 }
